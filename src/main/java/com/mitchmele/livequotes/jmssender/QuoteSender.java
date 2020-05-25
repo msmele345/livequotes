@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class QuoteSender {
 
-
-
     private final Logger logger = LoggerFactory.getLogger(QuoteSender.class);
 
     @Autowired

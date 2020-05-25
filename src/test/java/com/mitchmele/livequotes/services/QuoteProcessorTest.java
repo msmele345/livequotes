@@ -1,12 +1,12 @@
 package com.mitchmele.livequotes.services;
 
-import com.mitchmele.livequotes.models.Bid;
+import com.mitchmele.livequotes.models.Quote;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class QuoteProcessorTest {
@@ -19,8 +19,8 @@ class QuoteProcessorTest {
     }
 
     @Test
-    public void generateBids_success() {
-        List<Bid> actual = subject.generateBids();
+    public void generateQuotes_success() {
+        List<Quote> actual = subject.generateQuotes();
         assertThat(actual).hasSize(20);
     }
 
@@ -31,9 +31,8 @@ class QuoteProcessorTest {
     }
 
     @Test
-    public void createBidPrice_success_shouldCreateRanDoublePrice_Rounded() {
-        Double actual = subject.createPrice();
-        assertThat(actual).isInstanceOf(Double.class);
-        assertThat(actual).isGreaterThan(0.0);
+    public void createPrice_success_shouldCreateRanDoublePrice_Rounded() {
+       List<BigDecimal> actual = subject.createPrice();
+        assertThat(actual).hasSize(2);
     }
 }

@@ -9,7 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
 
 @Data
-@Entity
+//@Entity
 public class Ask  {
 
     @Id

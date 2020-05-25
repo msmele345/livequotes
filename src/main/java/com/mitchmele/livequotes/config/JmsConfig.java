@@ -1,11 +1,11 @@
 package com.mitchmele.livequotes.config;
 
 
+import com.mitchmele.livequotes.jmsconsumer.JmsQuoteErrorHandler;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
-import org.springframework.boot.autoconfigure.jms.JmsPoolConnectionFactoryFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
@@ -18,7 +18,6 @@ import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
-import javax.jms.JMSConnectionFactory;
 
 @Configuration
 @EnableJms
@@ -28,8 +27,8 @@ public class JmsConfig {
     @Value("${spring.activemq.broker-url}")
     private String brokerUrl;
 
-    @Value("${destination.bid}")
-    private String bids;
+    @Value("${destination.quote}")
+    private String quotes;
 
 
     @Bean
@@ -47,14 +46,14 @@ public class JmsConfig {
     }
 
     @Bean
-    Destination bidDestination() {
-        return new ActiveMQQueue(bids);
+    Destination quoteDestination() {
+        return new ActiveMQQueue(quotes);
     }
 
     @Bean
     public JmsTemplate jmsTemplate() {
         JmsTemplate jmsTemplate = new JmsTemplate(cachingConnectionFactory());
-        jmsTemplate.setDefaultDestination(bidDestination());
+        jmsTemplate.setDefaultDestination(quoteDestination());
         jmsTemplate.setReceiveTimeout(5000);
         return jmsTemplate;
     }
@@ -66,6 +65,7 @@ public class JmsConfig {
     ) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         configurer.configure(factory, cachingConnectionFactory);
+        factory.setErrorHandler(new JmsQuoteErrorHandler());
         return factory;
     }
 
@@ -74,7 +74,7 @@ public class JmsConfig {
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
         converter.setTargetType(MessageType.TEXT);
-        converter.setTypeIdPropertyName("_type");
+//        converter.setTypeIdPropertyName("id");
         return converter;
     }
 }

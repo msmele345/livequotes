@@ -1,17 +1,15 @@
 package com.mitchmele.livequotes.models;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
+import java.math.BigDecimal;
 import java.util.Random;
 
 @Data
 @Entity
-@Table(name = "quote", schema = "dbo")
+//@Table(name = "quote", schema = "dbo")
+@Table(name = "quote_tbl")
 public class Quote {
 
 
@@ -24,23 +22,17 @@ public class Quote {
     String symbol;
 
     @Column(name = "Bidprice")
-    Double bidPrice;
+    BigDecimal bidPrice;
 
     @Column(name = "Askprice")
-    Double askPrice;
+    BigDecimal askPrice;
 
     public Quote() {}
 
-    public Quote(@NonNull String symbol, Double bidPrice, double askPrice) {
-        this.id = setId();
+    public Quote(@NonNull String symbol, BigDecimal bidPrice, BigDecimal askPrice) {
         this.symbol = symbol;
         this.bidPrice = bidPrice;
         this.askPrice = askPrice;
-    }
-
-    public Integer setId() {
-        Random random = new Random();
-        return random.nextInt();
     }
 
     public Integer getId() {
@@ -51,11 +43,11 @@ public class Quote {
         return symbol;
     }
 
-    public Double getBidPrice() {
+    public BigDecimal getBidPrice() {
         return bidPrice;
     }
 
-    public Double getAskPrice() {
+    public BigDecimal getAskPrice() {
         return askPrice;
     }
 

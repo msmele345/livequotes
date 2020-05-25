@@ -6,4 +6,4 @@ queue:
   boot: boot.q
 
 destination:
-  bid: bids
+  quote: quotes

@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 
 @Data
-@Entity
+//@Entity
 public class Bid {
 
 

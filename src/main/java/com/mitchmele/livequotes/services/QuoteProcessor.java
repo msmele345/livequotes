@@ -2,27 +2,32 @@ package com.mitchmele.livequotes.services;
 
 
 import com.mitchmele.livequotes.models.Bid;
+import com.mitchmele.livequotes.models.Quote;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import static java.util.Arrays.asList;
 
 @Service
 public class QuoteProcessor implements QuoteGenerator {
 
     private final Random ran = new Random();
 
-    public List<Bid> generateBids() {
-        List<Bid> bids = new ArrayList<>();
+    public List<Quote> generateQuotes() {
+        List<Quote> quotes = new ArrayList<>();
 
         for (int i = 0; i < 20; i++) {
             String symbol = createSymbol();
-            Double price = createPrice();
-            Bid newBid = new Bid(symbol, price);
-            bids.add(newBid);
+            List<BigDecimal> price = createPrice();
+            Quote newQuote = new Quote(symbol, price.get(0), price.get(1));
+            quotes.add(newQuote);
         }
-        return bids;
+        return quotes;
     }
 
 
@@ -35,10 +40,20 @@ public class QuoteProcessor implements QuoteGenerator {
         return stringBuilder.toString();
     }
 
-    public Double createPrice() {
-        double randDouble = 0.0 + (100.00 - 0.00) * ran.nextDouble();
-        DecimalFormat df = new DecimalFormat("#.##");
-        randDouble = Double.parseDouble(df.format(randDouble));
-        return randDouble;
+    public List<BigDecimal> createPrice() {
+        double randBidDouble = 0.0 + (100.00 - 0.00) * ran.nextDouble();
+        double byPrice = randBidDouble * 0.01;
+
+        double randAskDouble = randBidDouble + byPrice;
+
+        BigDecimal bigDecimalBid = BigDecimal.valueOf(randBidDouble);
+        BigDecimal bigDecimalAsk = BigDecimal.valueOf(randAskDouble);
+
+        return asList(
+                bigDecimalBid
+                        .setScale(2, RoundingMode.HALF_DOWN),
+                bigDecimalAsk
+                        .setScale(2, RoundingMode.HALF_DOWN)
+        );
     }
 }
