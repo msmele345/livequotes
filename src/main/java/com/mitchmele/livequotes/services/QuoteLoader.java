@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @Component
@@ -42,8 +41,8 @@ public class QuoteLoader implements ApplicationListener<ContextRefreshedEvent> {
         try {
             quoteRepository.saveAll(newQuotes);
             newQuotes.forEach(q -> {
-                logger.info("SAVED QUOTE ID: " +  q.getId() + "FOR SYMBOL: " + q.getSymbol());
-//                quoteSender.send("quotes", q.getSymbol());
+                logger.info("SAVED QUOTE ID: " +  q.getId() + " FOR SYMBOL: " + q.getSymbol());
+                quoteSender.send("quotes", q);
             });
         } catch (Exception e) {
             e.printStackTrace();

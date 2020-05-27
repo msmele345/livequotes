@@ -66,6 +66,7 @@ public class JmsConfig {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         configurer.configure(factory, cachingConnectionFactory);
         factory.setErrorHandler(new JmsQuoteErrorHandler());
+        factory.setMessageConverter(jacksonJmsMessageConverter());
         return factory;
     }
 
