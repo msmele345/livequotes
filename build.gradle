@@ -24,11 +24,10 @@ dependencies {
 
 	implementation 'org.springframework:spring-jms:5.2.6.RELEASE'
 
-//	implementation 'com.microsoft.sqlserver:mssql-jdbc:8.2.2.jre10'
-
 	implementation 'com.microsoft.sqlserver:mssql-jdbc:7.0.0.jre8'
+	implementation 'org.json:json:20200518'
 
-	compileOnly 'org.projectlombok:lombok'
+	implementation 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
 

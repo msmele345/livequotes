@@ -2,6 +2,7 @@ package com.mitchmele.livequotes.config;
 
 
 import com.mitchmele.livequotes.jmsconsumer.JmsQuoteErrorHandler;
+import com.mitchmele.livequotes.jmsconsumer.QuoteListener;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +14,11 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
+
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 
@@ -58,16 +61,30 @@ public class JmsConfig {
         return jmsTemplate;
     }
 
+//    @Bean
+//    public JmsListenerContainerFactory<?> jmsListenerContainerFactory(
+//            ConnectionFactory cachingConnectionFactory,
+//            DefaultJmsListenerContainerFactoryConfigurer configurer
+//    ) {
+//        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+//        configurer.configure(factory, cachingConnectionFactory);
+//        factory.setErrorHandler(new JmsQuoteErrorHandler());
+//        factory.setMessageConverter(jacksonJmsMessageConverter());
+//        return factory;
+//    }
+
     @Bean
-    public JmsListenerContainerFactory<?> jmsListenerContainerFactory(
-            ConnectionFactory cachingConnectionFactory,
-            DefaultJmsListenerContainerFactoryConfigurer configurer
+    DefaultMessageListenerContainer defaultMessageListenerContainer(
+            QuoteListener quoteListener,
+            JmsQuoteErrorHandler jmsQuoteErrorHandler
     ) {
-        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-        configurer.configure(factory, cachingConnectionFactory);
-        factory.setErrorHandler(new JmsQuoteErrorHandler());
-        factory.setMessageConverter(jacksonJmsMessageConverter());
-        return factory;
+        DefaultMessageListenerContainer defaultMessageListenerContainer = new DefaultMessageListenerContainer();
+        defaultMessageListenerContainer.setMessageListener(quoteListener);
+        defaultMessageListenerContainer.setConnectionFactory(cachingConnectionFactory());
+        defaultMessageListenerContainer.setMessageConverter(jacksonJmsMessageConverter());
+        defaultMessageListenerContainer.setErrorHandler(jmsQuoteErrorHandler);
+        defaultMessageListenerContainer.setDestinationName(quotes);
+        return defaultMessageListenerContainer;
     }
 
 
@@ -75,7 +92,8 @@ public class JmsConfig {
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
         converter.setTargetType(MessageType.TEXT);
-//        converter.setTypeIdPropertyName("id");
+//        converter.setTypeIdPropertyName("_id");
         return converter;
     }
+
 }

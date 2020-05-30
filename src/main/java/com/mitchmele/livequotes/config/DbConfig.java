@@ -1,4 +1,4 @@
-package com.mitchmele.livequotes.sqlserver;
+package com.mitchmele.livequotes.config;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;

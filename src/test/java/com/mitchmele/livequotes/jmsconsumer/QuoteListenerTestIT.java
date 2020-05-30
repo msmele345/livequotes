@@ -1,7 +1,7 @@
 package com.mitchmele.livequotes.jmsconsumer;
 
 
-import com.mitchmele.livequotes.jmssender.QuoteSender;
+import com.mitchmele.livequotes.jmssender.QuotePublisher;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,19 +9,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
-public class QuoteReceiverTest {
+public class QuoteListenerTestIT {
 
     @Autowired
-    QuoteSender quoteSender;
+    QuotePublisher quotePublisher;
 
     @Autowired
-    QuoteReceiver quoteReceiver;
+    QuoteListener quoteListener;
 
     @Test
     public void quoteReceiver_success_consumesAQuote() throws InterruptedException {
-        quoteSender.send("boot.q", "Hello Boot!");
-
-        quoteReceiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
     }
-
 }

@@ -1,44 +1,44 @@
 package com.mitchmele.livequotes.models;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-
 import javax.persistence.*;
-
+import java.math.BigDecimal;
 
 @Data
-//@Entity
-public class Bid {
-
+@Builder
+@Entity
+@Table(name = "BID")
+public class Bid implements QuotePrice {
 
     @Id
-    @GeneratedValue
-    int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, unique = true)
+    Integer id;
 
-    String type;
-
-    @NonNull
     String symbol;
 
-    @NonNull
-    Double bidPrice;
-
-    final String ENTITY_TYPE = "BID";
+    @Column(name = "Bidprice")
+    BigDecimal bidPrice;
 
     public Bid() {}
 
-    public Bid(String symbol, Double bidPrice) {
-        this.type = ENTITY_TYPE;
+    public Bid(Integer id, String symbol, BigDecimal bidPrice) {
+        this.id = id;
         this.symbol = symbol;
         this.bidPrice = bidPrice;
     }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getSymbol() {
         return symbol;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return bidPrice;
     }
 }

@@ -1,44 +1,46 @@
 package com.mitchmele.livequotes.models;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
+
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Table;
+import java.math.BigDecimal;
 
 @Data
-//@Entity
-public class Ask  {
+@Builder
+@Entity
+@Table(name = "ASK")
+public class Ask implements QuotePrice {
 
     @Id
-    @GeneratedValue
-    int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, unique = true)
+    Integer id;
 
-    String type;
-
-    @NonNull
     String symbol;
 
-    @NonNull
-    Double askPrice;
+    @Column(name = "Askprice")
+    private BigDecimal askPrice;
 
-    final String ENTITY_TYPE = "ASK";
+    public Ask() {
+    }
 
-    public Ask() { }
-
-    public Ask(String symbol, Double askPrice) {
-        this.type = ENTITY_TYPE;
+    public Ask(Integer id, String symbol, BigDecimal askPrice) {
+        this.id = id;
         this.symbol = symbol;
         this.askPrice = askPrice;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getSymbol() {
         return symbol;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return askPrice;
     }
 }

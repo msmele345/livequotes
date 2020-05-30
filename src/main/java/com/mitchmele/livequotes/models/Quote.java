@@ -1,5 +1,6 @@
 package com.mitchmele.livequotes.models;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import javax.persistence.*;
@@ -11,7 +12,6 @@ import java.util.Random;
 //@Table(name = "quote", schema = "dbo")
 @Table(name = "quote_tbl")
 public class Quote {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
