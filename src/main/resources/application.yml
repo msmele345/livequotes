@@ -6,4 +6,5 @@ queue:
   boot: boot.q
 
 destination:
+  error: errors
   quote: quotes

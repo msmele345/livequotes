@@ -4,8 +4,6 @@ import com.mitchmele.livequotes.jmssender.QuotePublisher;
 import com.mitchmele.livequotes.models.Quote;
 import com.mitchmele.livequotes.sqlserver.QuoteRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
@@ -17,14 +15,12 @@ import java.util.List;
 @Component
 public class QuoteLoader implements ApplicationListener<ContextRefreshedEvent> {
 
-//    private final Logger logger = LoggerFactory.getLogger(QuoteLoader.class);
-
     @Value("${destination.quote}")
     String defaultDestination;
 
-    QuoteProcessor quoteProcessor;
-    QuoteRepository quoteRepository;
-    QuotePublisher quotePublisher;
+    private QuoteProcessor quoteProcessor;
+    private QuoteRepository quoteRepository;
+    private QuotePublisher quotePublisher;
 
     @Autowired
     public void setQuoteProcessor(QuoteProcessor quoteProcessor) {

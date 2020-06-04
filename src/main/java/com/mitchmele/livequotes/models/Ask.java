@@ -1,14 +1,16 @@
 package com.mitchmele.livequotes.models;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "ASK")
 public class Ask implements QuotePrice {
@@ -16,21 +18,16 @@ public class Ask implements QuotePrice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
-    Integer id;
+    private Integer id;
 
-    String symbol;
+    private String symbol;
 
     @Column(name = "Askprice")
     private BigDecimal askPrice;
 
-    public Ask() {
-    }
-
-    public Ask(Integer id, String symbol, BigDecimal askPrice) {
-        this.id = id;
-        this.symbol = symbol;
-        this.askPrice = askPrice;
-    }
+    @Column(name = "CREATED_TS", updatable = false)
+    @CreationTimestamp
+    private Date timeStamp;
 
     public void setId(Integer id) {
         this.id = id;

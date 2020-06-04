@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Date;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,12 +24,12 @@ class BidConverterTest {
 
     @Test
     public void convert_shouldCreateBidFromIncomingQuote() {
-        Bid expectedBid = new Bid(19, "UOQ", BigDecimal.valueOf(17.82));
+        Bid expectedBid = new Bid( 19, "UOQ", BigDecimal.valueOf(17.82) ,new Date());
 
         String incomingJson = "{\"id\":19,\"symbol\":\"UOQ\",\"bidPrice\":17.82,\"askPrice\":18.00}";
 
         Bid actual = converter.convert(incomingJson);
-        assertThat(actual).isEqualTo(expectedBid);
+        assertThat(actual).isEqualToIgnoringGivenFields(expectedBid, "timeStamp");
     }
 
     @Test

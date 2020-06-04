@@ -1,63 +1,38 @@
 package com.mitchmele.livequotes.models;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Random;
 
 @Data
 @Entity
-//@Table(name = "quote", schema = "dbo")
-@Table(name = "quote_tbl")
-public class Quote {
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "QUOTE")
+public class Quote implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
-    Integer id;
+    private Integer id;
 
-    @NonNull
-    String symbol;
+    private String symbol;
 
     @Column(name = "Bidprice")
-    BigDecimal bidPrice;
+    private BigDecimal bidPrice;
 
     @Column(name = "Askprice")
-    BigDecimal askPrice;
+    private BigDecimal askPrice;
 
-    public Quote() {}
 
-    public Quote(@NonNull String symbol, BigDecimal bidPrice, BigDecimal askPrice) {
-        this.symbol = symbol;
-        this.bidPrice = bidPrice;
-        this.askPrice = askPrice;
-    }
+    @Column(name = "CREATED_TS", updatable = false)
+    @CreationTimestamp
+    private Date timeStamp;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public BigDecimal getBidPrice() {
-        return bidPrice;
-    }
-
-    public BigDecimal getAskPrice() {
-        return askPrice;
-    }
-
-    @Override
-    public String toString() {
-        return "Quote{" +
-                "id=" + id +
-                ", symbol='" + symbol + '\'' +
-                ", bidPrice=" + bidPrice +
-                ", askPrice=" + askPrice +
-                '}';
-    }
 }

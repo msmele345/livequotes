@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,12 +22,11 @@ class AskConverterTest {
 
     @Test
     public void convert_shouldParseJsonAndReturnAsk() {
-        Ask expectedAsk = new Ask(19, "UOQ", BigDecimal.valueOf(18.01));
+        Ask expectedAsk = new Ask(19, "UOQ", BigDecimal.valueOf(18.01), new Date());
 
         String incomingJson = "{\"id\":19,\"symbol\":\"UOQ\",\"bidPrice\":17.82,\"askPrice\":18.01}";
 
         Ask actual = converter.convert(incomingJson);
-        assertThat(actual).isEqualTo(expectedAsk);
+        assertThat(actual).isEqualToIgnoringGivenFields(expectedAsk, "timeStamp");
     }
-
 }

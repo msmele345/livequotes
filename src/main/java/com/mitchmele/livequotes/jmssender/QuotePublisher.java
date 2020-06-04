@@ -25,7 +25,8 @@ public class QuotePublisher {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             jsonQuote = objectMapper.writeValueAsString(quote);
-            jmsTemplate.send(destination, s -> s.createTextMessage(jsonQuote));
+//            jmsTemplate.send(destination, s -> s.createTextMessage(jsonQuote));
+            jmsTemplate.convertAndSend(destination, quote);
         } catch (Exception e) {
             throw new RuntimeException(e.getLocalizedMessage());
         }

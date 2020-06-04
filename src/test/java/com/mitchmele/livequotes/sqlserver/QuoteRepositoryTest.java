@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,10 +16,10 @@ class QuoteRepositoryTest {
     @Autowired
     QuoteRepository quoteRepository;
 
-    Quote quote1 = new Quote("EEE", BigDecimal.valueOf(90.00),  BigDecimal.valueOf(90.25));
-    Quote quote2 = new Quote("PPO",  BigDecimal.valueOf(114.05),  BigDecimal.valueOf(141.55));
-    Quote quote3 = new Quote("MKL",  BigDecimal.valueOf(56.05),  BigDecimal.valueOf(56.11));
-    Quote quote4 = new Quote("MKL",  BigDecimal.valueOf(56.15),  BigDecimal.valueOf(56.25));
+    Quote quote1 = new Quote(1, "EEE", BigDecimal.valueOf(90.00),  BigDecimal.valueOf(90.25), new Date(1000));
+    Quote quote2 = new Quote(2, "PPO",  BigDecimal.valueOf(114.05),  BigDecimal.valueOf(141.55), new Date(2000));
+    Quote quote3 = new Quote(3, "MKL",  BigDecimal.valueOf(56.05),  BigDecimal.valueOf(56.11), new Date(3000));
+    Quote quote4 = new Quote(4, "MKL",  BigDecimal.valueOf(56.15),  BigDecimal.valueOf(56.25), new Date(4000));
 
     @BeforeEach
     void setUp() {
@@ -26,17 +27,14 @@ class QuoteRepositoryTest {
     }
 
     @Test
-    public void contextLoads() {
-    }
+    public void contextLoads() { }
 
     @Test
     public void save_success_savesQuote_entity_toSqlServer() {
-
-        assertThat(quote1.getId()).isNull();
         Quote actual = quoteRepository.save(quote1);
 
         assertThat(actual.getId()).isNotNull();
-        assertThat(actual).isEqualTo(quote1);
+        assertThat(actual).isEqualToIgnoringGivenFields(quote1, "id", "timeStamp");
     }
 
     @Test
@@ -49,7 +47,8 @@ class QuoteRepositoryTest {
         List<Quote> actual = quoteRepository.findAllBySymbol("MKL");
 
         assertThat(actual).hasSize(2);
-        assertThat(actual).containsExactly(quote3, quote4);
+        assertThat(actual.get(0)).isEqualToIgnoringGivenFields(quote3,"id", "timeStamp");
+        assertThat(actual.get(1)).isEqualToIgnoringGivenFields(quote4, "id", "timeStamp");
     }
 
     @Test
