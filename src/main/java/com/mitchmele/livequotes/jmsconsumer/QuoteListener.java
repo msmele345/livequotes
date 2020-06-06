@@ -1,7 +1,7 @@
 package com.mitchmele.livequotes.jmsconsumer;
 
 import com.mitchmele.livequotes.models.Quote;
-import com.mitchmele.livequotes.services.QuoteSplitterService;
+import com.mitchmele.livequotes.services.OutboundQuoteOrchestrator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.command.ActiveMQMessage;
@@ -10,14 +10,13 @@ import org.springframework.stereotype.Component;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class QuoteListener implements MessageListener {
 
-    private final QuoteSplitterService quoteSplitterService;
+    private final OutboundQuoteOrchestrator outboundQuoteOrchestrator;
 
     @Override
     public void onMessage(Message message) {
@@ -27,7 +26,7 @@ public class QuoteListener implements MessageListener {
                 Quote incomingQuote = (Quote) msg.getObject();
 
                 log.info("CONSUMED MESSAGE: " + incomingQuote);
-                quoteSplitterService.splitAndStorePrices(incomingQuote);
+                outboundQuoteOrchestrator.splitAndStorePrices(incomingQuote);
             } catch (Exception e) {
                 throw new RuntimeException(parseException(e.getMessage()));
             }
@@ -39,7 +38,7 @@ public class QuoteListener implements MessageListener {
     private String parseException(String message) {
         String[] msg = message.split(" ");
         String[] copied = Arrays.copyOfRange(msg, 1, msg.length);
-        return Arrays.stream(copied).collect(Collectors.joining(" "));
+        return String.join(" ", copied);
     }
 }
 /*

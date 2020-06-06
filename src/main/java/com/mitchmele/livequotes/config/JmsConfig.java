@@ -31,6 +31,9 @@ public class JmsConfig {
     @Value("${destination.error}")
     private String errors;
 
+    @Value("${destination.outbound}")
+    private String stocks;
+
 
     @Bean
     public ActiveMQConnectionFactory senderActiveMqConnectionFactory() {
@@ -55,6 +58,11 @@ public class JmsConfig {
     @Bean
     Destination errorDestination() {
         return new ActiveMQQueue(errors);
+    }
+
+    @Bean
+    Destination outboundDestination() {
+        return new ActiveMQQueue(stocks);
     }
 
     @Bean

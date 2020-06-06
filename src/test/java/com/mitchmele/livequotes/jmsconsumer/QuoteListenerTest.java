@@ -1,7 +1,7 @@
 package com.mitchmele.livequotes.jmsconsumer;
 
 import com.mitchmele.livequotes.models.Quote;
-import com.mitchmele.livequotes.services.QuoteSplitterService;
+import com.mitchmele.livequotes.services.OutboundQuoteOrchestrator;
 import org.apache.activemq.command.ActiveMQObjectMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 class QuoteListenerTest {
 
     @Mock
-    QuoteSplitterService mockQuoteSplitterService;
+    OutboundQuoteOrchestrator mockOutboundQuoteOrchestrator;
 
     @InjectMocks
     QuoteListener quoteListener;
@@ -36,7 +36,7 @@ class QuoteListenerTest {
         when(incomingMessage.getObject()).thenReturn(incomingQuote);
 
         quoteListener.onMessage(incomingMessage);
-        verify(mockQuoteSplitterService).splitAndStorePrices(incomingQuote);
+        verify(mockOutboundQuoteOrchestrator).splitAndStorePrices(incomingQuote);
     }
 
     @Test
@@ -47,6 +47,6 @@ class QuoteListenerTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("cannot be cast to org.apache.activemq.command.ActiveMQObjectMessage");
 
-        verify(mockQuoteSplitterService, times(0)).splitAndStorePrices(any());
+        verify(mockOutboundQuoteOrchestrator, times(0)).splitAndStorePrices(any());
     }
 }
