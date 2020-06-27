@@ -19,7 +19,7 @@ public class QuoteProcessor implements QuoteGenerator {
     public List<Quote> generateQuotes() {
         List<Quote> quotes = new ArrayList<>();
 
-        for (int i = 1; i < 21; i++) {
+        for (int i = 1; i < 5; i++) {
             String symbol = createSymbol();
             List<BigDecimal> price = createPrice();
             Quote newQuote = new Quote(i, symbol, price.get(0), price.get(1), new Date((i * 2) + 1000));
@@ -39,7 +39,7 @@ public class QuoteProcessor implements QuoteGenerator {
 
     public List<BigDecimal> createPrice() {
         double randBidDouble = 0.0 + (100.00 - 0.00) * ran.nextDouble();
-        double byPrice = randBidDouble * 0.01;
+        double byPrice = randBidDouble * 0.005;
 
         double randAskDouble = randBidDouble + byPrice;
 

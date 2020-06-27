@@ -2,8 +2,8 @@ package com.mitchmele.livequotes.models;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -13,7 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "ASK")
-public class Ask implements QuotePrice {
+public class Ask implements QuotePrice, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

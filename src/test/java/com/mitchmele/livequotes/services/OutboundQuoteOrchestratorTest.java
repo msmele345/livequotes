@@ -1,5 +1,6 @@
 package com.mitchmele.livequotes.services;
 
+import com.mitchmele.livequotes.jmssender.QuotePublisher;
 import com.mitchmele.livequotes.models.Ask;
 import com.mitchmele.livequotes.models.Bid;
 import com.mitchmele.livequotes.models.Quote;
@@ -27,14 +28,14 @@ class OutboundQuoteOrchestratorTest {
     @Mock
     AskRepository mockAskRepository;
 
+    @Mock
+    QuotePublisher mockQuotePublisher;
+
     @InjectMocks
     OutboundQuoteOrchestrator outboundQuoteOrchestrator;
 
-    /*
-    * {"id":19,"symbol":"UOQ","bidPrice":17.82,"askPrice":18.00}
-    * */
     @Test
-    public void splitAndStorePrices_shouldCallConverters() throws IOException {
+    public void splitAndStorePrices_saveBidAndAsk_thenSendToOutbound() throws IOException {
         Quote incomingQuote = Quote.builder()
                 .symbol("UOQ")
                 .bidPrice(BigDecimal.valueOf(17.82))
@@ -44,10 +45,12 @@ class OutboundQuoteOrchestratorTest {
         Bid expectedBid = new Bid(null, "UOQ", BigDecimal.valueOf(17.82), null);
         Ask expectedAsk = new Ask(null, "UOQ", BigDecimal.valueOf(18.01), null);
 
-        outboundQuoteOrchestrator.splitAndStorePrices(incomingQuote);
+        outboundQuoteOrchestrator.orchestrate(incomingQuote);
 
         verify(mockBidRepository).save(expectedBid);
         verify(mockAskRepository).save(expectedAsk);
+        verify(mockQuotePublisher).sendToOutbound("stocks", expectedBid);
+        verify(mockQuotePublisher).sendToOutbound("stocks", expectedAsk);
     }
 
     @Test
@@ -61,7 +64,7 @@ class OutboundQuoteOrchestratorTest {
 
         when(mockBidRepository.save(any())).thenThrow(new RuntimeException("bad bid"));
 
-        assertThatThrownBy(() -> outboundQuoteOrchestrator.splitAndStorePrices(incomingQuote))
+        assertThatThrownBy(() -> outboundQuoteOrchestrator.orchestrate(incomingQuote))
                 .isInstanceOf(IOException.class)
                 .hasMessage("bad bid");
     }
@@ -76,7 +79,7 @@ class OutboundQuoteOrchestratorTest {
 
         when(mockAskRepository.save(any())).thenThrow(new RuntimeException("bad ask"));
 
-        assertThatThrownBy(() -> outboundQuoteOrchestrator.splitAndStorePrices(incomingQuote))
+        assertThatThrownBy(() -> outboundQuoteOrchestrator.orchestrate(incomingQuote))
                 .isInstanceOf(IOException.class)
                 .hasMessage("bad ask");
     }

@@ -54,16 +54,18 @@ class QuotePublisherTest {
 
     @Test
     public void sendToOutbound_sendsMessageContainingQuotePrice_toOutbound() {
-        Bid newBid = Bid.builder()
+        Bid incomingBid = Bid.builder()
                 .symbol("ZYY")
                 .bidPrice(BigDecimal.valueOf(201.56))
                 .build();
 
         String destination = "stocks";
 
-        quotePublisher.sendToOutbound(destination, newBid);
+        String outBoundBidJson = "{\"id\":null,\"symbol\":\"ZYY\",\"bidPrice\":201.56,\"timeStamp\":null,\"price\":201.56}";
 
-        verify(mockJmsTemplate).convertAndSend(destination, newBid);
+        quotePublisher.sendToOutbound(destination, incomingBid);
+
+        verify(mockJmsTemplate).convertAndSend(destination, outBoundBidJson);
     }
 
     @Test
@@ -76,8 +78,7 @@ class QuotePublisherTest {
         doThrow(new RuntimeException("bad news")).when(mockJmsTemplate).convertAndSend(anyString(), any(QuotePrice.class));
 
         assertThatThrownBy(() -> quotePublisher.sendToOutbound("stocks", incomingBid))
-                .isInstanceOf(QuoteMessageException.class)
-                .hasMessage("Error Type: ROUTING, Domain: Publisher: ZYY  - sendToOutbound(), Message: bad news");
+                .isInstanceOf(QuoteMessageException.class);
     }
 
     @Test

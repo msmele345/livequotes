@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -13,7 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "BID")
-public class Bid implements QuotePrice {
+public class Bid implements QuotePrice, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

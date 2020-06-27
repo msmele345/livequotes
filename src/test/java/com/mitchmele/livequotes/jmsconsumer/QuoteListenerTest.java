@@ -1,5 +1,6 @@
 package com.mitchmele.livequotes.jmsconsumer;
 
+import com.mitchmele.livequotes.common.QuoteMessageException;
 import com.mitchmele.livequotes.models.Quote;
 import com.mitchmele.livequotes.services.OutboundQuoteOrchestrator;
 import org.apache.activemq.command.ActiveMQObjectMessage;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import javax.jms.Message;
 import java.io.IOException;
 import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -36,17 +38,26 @@ class QuoteListenerTest {
         when(incomingMessage.getObject()).thenReturn(incomingQuote);
 
         quoteListener.onMessage(incomingMessage);
-        verify(mockOutboundQuoteOrchestrator).splitAndStorePrices(incomingQuote);
+        verify(mockOutboundQuoteOrchestrator).orchestrate(incomingQuote);
     }
 
     @Test
-    public void onMessage_shouldThrowIllegalArgumentException_whenIncomingMessageIsNotObjectMsg() throws IOException {
-        ActiveMQTextMessage incomingMessage = mock(ActiveMQTextMessage.class);
+    public void onMessage_throwsQuoteMessageException_whenIncomingMessageIsNotObjectMsg() throws IOException {
+        ActiveMQTextMessage incomingInvalidMessageType = mock(ActiveMQTextMessage.class);
 
-        assertThatThrownBy(() -> quoteListener.onMessage(incomingMessage))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("cannot be cast to org.apache.activemq.command.ActiveMQObjectMessage");
+        assertThatThrownBy(() -> quoteListener.onMessage(incomingInvalidMessageType))
+                .isInstanceOf(QuoteMessageException.class)
+                .hasMessage("Error Type: ROUTING, Domain: Quote Listener, Message: cannot be cast to org.apache.activemq.command.ActiveMQObjectMessage");
 
-        verify(mockOutboundQuoteOrchestrator, times(0)).splitAndStorePrices(any());
+        verify(mockOutboundQuoteOrchestrator, times(0)).orchestrate(any());
+    }
+
+    @Test
+    public void onMessage_throwsQuoteMessageExceptionWithGenericMessage_whenIncomingMsgIsNotFromActiveMq() {
+        Message msg = mock(Message.class);
+
+        assertThatThrownBy(() -> quoteListener.onMessage(msg))
+                .isInstanceOf(QuoteMessageException.class)
+                .hasMessage("Error Type: ROUTING, Domain: INVALID INBOUND MESSAGE TYPE (NON ACTIVE MQ), Message: null");
     }
 }
