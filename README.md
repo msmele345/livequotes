@@ -1,5 +1,5 @@
 # livequotes  
-### A back end application that generates Stock Quotes and routes them to several JMS clients
+### A back end application that generates Stock Quotes and routes them to multiple JMS clients
     - See interstellar-exchange and stock-loader for JMS clients tied to this application.
 
 FLOW:
@@ -8,6 +8,6 @@ FLOW:
 3. QuoteListener picks up quote messages from JMS quotes queue and calls the Orchestrator for further processing.
 4. OutboundQuoteOrchestrator splits quote up into bid and ask objects, then saves them to SQL for trade consideration at the interstellar-exchange
 5. OutboundQuoteOrchestrator then sends bid and ask objects to outbound queues that are picked up by other applications.
-6. Stock-Loader or interstellar exchange applications picks them up to match and persist Trades.   
+6. The Stock-Loader and Interstellar Exchange applications pick messages up from the outbound queues to match and persist Trades.   
 
 
