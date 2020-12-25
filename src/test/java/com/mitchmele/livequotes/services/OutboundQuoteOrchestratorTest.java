@@ -1,9 +1,9 @@
 package com.mitchmele.livequotes.services;
 
 import com.mitchmele.livequotes.jmssender.QuotePublisher;
-import com.mitchmele.livequotes.models.Ask;
-import com.mitchmele.livequotes.models.Bid;
-import com.mitchmele.livequotes.models.Quote;
+import com.mitchmele.livequotes.models.*;
+import com.mitchmele.livequotes.mongo.AskDORepository;
+import com.mitchmele.livequotes.mongo.BidDORepository;
 import com.mitchmele.livequotes.sqlserver.AskRepository;
 import com.mitchmele.livequotes.sqlserver.BidRepository;
 import org.junit.jupiter.api.Test;
@@ -13,11 +13,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.math.BigDecimal;
-
+import java.util.Date;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OutboundQuoteOrchestratorTest {
@@ -29,6 +28,18 @@ class OutboundQuoteOrchestratorTest {
     AskRepository mockAskRepository;
 
     @Mock
+    BidDORepository bidDORepository;
+
+    @Mock
+    AskDORepository askDORepository;
+
+    @Mock
+    BidConverter bidConverter;
+
+    @Mock
+    AskConverter askConverter;
+
+    @Mock
     QuotePublisher mockQuotePublisher;
 
     @InjectMocks
@@ -36,19 +47,49 @@ class OutboundQuoteOrchestratorTest {
 
     @Test
     public void splitAndStorePrices_saveBidAndAsk_thenSendToOutbound() throws IOException {
+
+        Date mockDate = mock(Date.class);
+
         Quote incomingQuote = Quote.builder()
                 .symbol("UOQ")
                 .bidPrice(BigDecimal.valueOf(17.82))
                 .askPrice(BigDecimal.valueOf(18.01))
+                .timeStamp(mockDate)
                 .build();
 
-        Bid expectedBid = new Bid(null, "UOQ", BigDecimal.valueOf(17.82), null);
-        Ask expectedAsk = new Ask(null, "UOQ", BigDecimal.valueOf(18.01), null);
+        Bid expectedBid = new Bid(null, "UOQ", BigDecimal.valueOf(17.82), mockDate);
+        Ask expectedAsk = new Ask(null, "UOQ", BigDecimal.valueOf(18.01), mockDate);
+
+        BidDO expectedBidDO = BidDO.builder()
+                .symbol("UOQ")
+                .id(1)
+                .bidPrice(BigDecimal.valueOf(17.82))
+                .timeStamp(mockDate)
+                .build();
+
+        AskDO expectedAskDO = AskDO.builder()
+                .symbol("UOQ")
+                .id(1)
+                .askPrice(BigDecimal.valueOf(18.01))
+                .timeStamp(mockDate)
+                .build();
+
+        when(mockBidRepository.save(any())).thenReturn(expectedBid);
+        when(mockAskRepository.save(any())).thenReturn(expectedAsk);
+        when(bidConverter.convert(any())).thenReturn(expectedBidDO);
+        when(askConverter.convert(any())).thenReturn(expectedAskDO);
 
         outboundQuoteOrchestrator.orchestrate(incomingQuote);
 
         verify(mockBidRepository).save(expectedBid);
         verify(mockAskRepository).save(expectedAsk);
+
+        verify(bidDORepository).save(expectedBidDO);
+        verify(askDORepository).save(expectedAskDO);
+
+        verify(askConverter).convert(expectedAsk);
+        verify(bidConverter).convert(expectedBid);
+
         verify(mockQuotePublisher).sendToOutbound("stocks", expectedBid);
         verify(mockQuotePublisher).sendToOutbound("stocks", expectedAsk);
     }
@@ -67,20 +108,5 @@ class OutboundQuoteOrchestratorTest {
         assertThatThrownBy(() -> outboundQuoteOrchestrator.orchestrate(incomingQuote))
                 .isInstanceOf(IOException.class)
                 .hasMessage("bad bid");
-    }
-
-    @Test
-    public void splitAndStorePrices_failure_shouldThrowIOExceptionIfAskSaveFails() {
-        Quote incomingQuote = Quote.builder()
-                .symbol("UOQ")
-                .bidPrice(BigDecimal.valueOf(17.82))
-                .askPrice(BigDecimal.valueOf(18.01))
-                .build();
-
-        when(mockAskRepository.save(any())).thenThrow(new RuntimeException("bad ask"));
-
-        assertThatThrownBy(() -> outboundQuoteOrchestrator.orchestrate(incomingQuote))
-                .isInstanceOf(IOException.class)
-                .hasMessage("bad ask");
     }
 }

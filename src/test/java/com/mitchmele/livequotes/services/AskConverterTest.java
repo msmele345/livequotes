@@ -1,7 +1,9 @@
 package com.mitchmele.livequotes.services;
 
 import com.mitchmele.livequotes.models.Ask;
+import com.mitchmele.livequotes.models.AskDO;
 import com.mitchmele.livequotes.models.Bid;
+import com.mitchmele.livequotes.models.BidDO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +12,7 @@ import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 class AskConverterTest {
 
@@ -21,12 +24,20 @@ class AskConverterTest {
     }
 
     @Test
-    public void convert_shouldParseJsonAndReturnAsk() {
-        Ask expectedAsk = new Ask(19, "UOQ", BigDecimal.valueOf(18.01), new Date());
+    public void convert_shouldCreateBidFromIncomingQuote() {
 
-        String incomingJson = "{\"id\":19,\"symbol\":\"UOQ\",\"bidPrice\":17.82,\"askPrice\":18.01}";
+        Date mockDate = mock(Date.class);
 
-        Ask actual = converter.convert(incomingJson);
-        assertThat(actual).isEqualToIgnoringGivenFields(expectedAsk, "timeStamp");
+        Ask inputAsk = new Ask( 19, "UOQ", BigDecimal.valueOf(17.82), mockDate);
+
+        AskDO expectedBid = AskDO.builder()
+                .symbol("UOQ")
+                .id(19)
+                .askPrice(BigDecimal.valueOf(17.82))
+                .timeStamp(mockDate)
+                .build();
+
+        AskDO actual = converter.convert(inputAsk);
+        assertThat(actual).isEqualToIgnoringGivenFields(expectedBid, "timeStamp");
     }
 }

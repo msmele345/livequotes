@@ -1,7 +1,11 @@
 package com.mitchmele.livequotes.services;
 
 import com.mitchmele.livequotes.models.Ask;
+import com.mitchmele.livequotes.models.AskDO;
+import com.mitchmele.livequotes.models.Bid;
+import com.mitchmele.livequotes.models.BidDO;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -10,24 +14,16 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Component
-@NoArgsConstructor
-public class AskConverter implements Converter<String, Ask> {
+@RequiredArgsConstructor
+public class AskConverter implements Converter<Ask, AskDO> {
 
     @Override
-    public Ask convert(String source) {
-        JSONObject quoteJson = new JSONObject(source);
-
-        BigDecimal askPrice = quoteJson
-                .getBigDecimal("askPrice")
-                .setScale(2, RoundingMode.HALF_EVEN);
-
-        Integer id = quoteJson.getInt("id");
-        String symbol = quoteJson.getString("symbol");
-
-        return Ask.builder()
-                .id(id)
-                .symbol(symbol)
-                .askPrice(askPrice)
+    public AskDO convert(Ask source) {
+        return AskDO.builder()
+                .id(source.getId())
+                .symbol(source.getSymbol())
+                .askPrice(source.getAskPrice())
+                .timeStamp(source.getTimeStamp())
                 .build();
     }
 }

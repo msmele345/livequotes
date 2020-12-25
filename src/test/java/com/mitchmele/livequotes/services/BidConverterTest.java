@@ -1,17 +1,13 @@
 package com.mitchmele.livequotes.services;
 
 import com.mitchmele.livequotes.models.Bid;
-import org.json.JSONException;
+import com.mitchmele.livequotes.models.BidDO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 class BidConverterTest {
 
@@ -24,23 +20,19 @@ class BidConverterTest {
 
     @Test
     public void convert_shouldCreateBidFromIncomingQuote() {
-        Bid expectedBid = new Bid( 19, "UOQ", BigDecimal.valueOf(17.82) ,new Date());
 
-        String incomingJson = "{\"id\":19,\"symbol\":\"UOQ\",\"bidPrice\":17.82,\"askPrice\":18.00}";
+        Date mockDate = mock(Date.class);
 
-        Bid actual = converter.convert(incomingJson);
+        Bid inputBid = new Bid( 19, "UOQ", BigDecimal.valueOf(17.82), mockDate);
+
+        BidDO expectedBid = BidDO.builder()
+                .symbol("UOQ")
+                .id(19)
+                .bidPrice(BigDecimal.valueOf(17.82))
+                .timeStamp(mockDate)
+                .build();
+
+        BidDO actual = converter.convert(inputBid);
         assertThat(actual).isEqualToIgnoringGivenFields(expectedBid, "timeStamp");
     }
-
-    @Test
-    public void convert_failure_shouldThrowIOExceptionIfParsingFails() {
-
-        String incomingBadJson = "{\"id\":19,\"symbol\":\"UOQ\",\"bidPre\":17.82,\"askPrice\":18.00}";
-
-        assertThatThrownBy(() -> converter.convert(incomingBadJson))
-                .isInstanceOf(JSONException.class)
-                .hasMessage("JSONObject[\"bidPrice\"] not found.");
-
-    }
-
 }

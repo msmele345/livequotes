@@ -1,9 +1,7 @@
 package com.mitchmele.livequotes.common;
 
-import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +16,7 @@ public class QuoteMessageException extends RuntimeException {
                  .map(e -> "Error Type: " + e.quoteErrorType + ", " + "Domain: " + e.domain + ", Message: " + e.exMessage)
                  .collect(Collectors.joining());
      }
+
 
      public QuoteMessageException(String message) {
          this.message = message;
